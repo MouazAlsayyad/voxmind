@@ -1,6 +1,6 @@
 import { PropertyType } from "@prisma/client";
 import { Exclude,Expose, Type } from "class-transformer";
-import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, ValidateNested } from "class-validator";
 
 export class HomeResponseDto {
   id:number;
@@ -141,4 +141,10 @@ export class InquireDto {
   @IsString()
   @IsNotEmpty()
   message:string
+}
+
+
+export class IdParamDto {
+  @IsInt()
+  id: number;
 }

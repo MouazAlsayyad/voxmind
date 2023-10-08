@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UnauthorizedException } from '@nestjs/common';
 import { HomeService } from './home.service';
-import { CreateHomeDto, HomeResponseDto, InquireDto, UpdateHomeDto } from './dto/home.dto';
+import { CreateHomeDto, HomeResponseDto, IdParamDto, InquireDto, UpdateHomeDto } from './dto/home.dto';
 import { PropertyType, UserType } from '@prisma/client';
 import { User, UserInfo } from 'src/user/decorators/user.decorator';
 
@@ -37,8 +37,8 @@ export class HomeController {
   }
 
   @Get(':id')
-  getHome(@Param('id',ParseIntPipe) id:number){
-    return this.homeService.getHomeById(id)
+  getHome(@Param() params: IdParamDto){
+    return this.homeService.getHomeById(params.id)
   }
 
   @Roles(UserType.REALTOR)
@@ -50,53 +50,53 @@ export class HomeController {
   @Roles(UserType.REALTOR)
   @Put(':id')
   async updateHome(
-    @Param('id',ParseIntPipe) id:number,
+    @Param() params: IdParamDto,
     @Body() body: UpdateHomeDto
     ,@User() user:UserInfo
   ){
-    const realtor = await this.homeService.getRealtorByHomeId(id)
+    const realtor = await this.homeService.getRealtorByHomeId(params.id)
 
     if(realtor.id !== user.id){
       throw new UnauthorizedException()
     }
 
-    return this.homeService.updateHomeById(id,body)
+    return this.homeService.updateHomeById(params.id,body)
   }
 
   @Roles(UserType.REALTOR)
   @Delete(':id')
-  async deleteHome(@Param("id",ParseIntPipe) id:number,@User() user:UserInfo){
+  async deleteHome(@Param() params: IdParamDto,@User() user:UserInfo){
     
-    const realtor = await this.homeService.getRealtorByHomeId(id)
+    const realtor = await this.homeService.getRealtorByHomeId(params.id)
 
     if(realtor.id !== user.id){
       throw new UnauthorizedException()
     }
-    return this.homeService.deleteHomeById(id)
+    return this.homeService.deleteHomeById(params.id)
   }
 
   @Roles(UserType.BUYER)
   @Post('/:id/inquire')
   inquire(
-    @Param('id',ParseIntPipe) homeId:number,
+    @Param() params: IdParamDto,
     @User() user:UserInfo,
     @Body() {message}:InquireDto
   ){
-    return this.homeService.inquire(user,homeId,message)
+    return this.homeService.inquire(user,params.id,message)
   }
 
   @Roles(UserType.REALTOR)
   @Get('/:id/messages')
   async getHomeMessages(
-    @Param('id',ParseIntPipe) id:number,
+    @Param() params: IdParamDto,
     @User() user:UserInfo,
   ){
-    const realtor = await this.homeService.getRealtorByHomeId(id)
+    const realtor = await this.homeService.getRealtorByHomeId(params.id)
 
     if(realtor.id !== user.id){
       throw new UnauthorizedException()
     }
-    return this.homeService.getMessagesByHome(id)
+    return this.homeService.getMessagesByHome(params.id)
   }
 
 }
