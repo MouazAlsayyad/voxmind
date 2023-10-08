@@ -2,19 +2,9 @@ import { ConflictException, HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from "bcryptjs"
 import * as jwt from "jsonwebtoken"
-import { UserType,User } from '@prisma/client';
+import { User } from '@prisma/client';
+import { SigninDto, SignupDto, UserTypeDto } from '../dtos/auth.dto';
 
-interface SignupParams {
-  email: string;
-  password:string;
-  phone:string;
-  name:string;
-}
-
-interface SigninParams {
-  email: string;
-  password:string;
-}
 
 const signToken = async (user:User)=>{
   return jwt.sign({
@@ -30,7 +20,7 @@ const signToken = async (user:User)=>{
 export class AuthService {
   constructor(private readonly prisma:PrismaService){}
   
-  async signup({email,password,name,phone}:SignupParams,userType:UserType){
+  async signup({email,password,name,phone}:SignupDto,userType:UserTypeDto){
     const userExists = await this.prisma.user.findUnique({
       where: {
         email
@@ -49,16 +39,16 @@ export class AuthService {
         name,
         password:hashedPassword,
         phone,
-        user_type: userType
+        user_type: userType.userType
       }
     })
 
     const token = await signToken(user)
-    user.password = undefined
+
     return {user,token}
   }
 
-  async signin({email,password}: SigninParams){
+  async signin({email,password}: SigninDto){
     const user = await this.prisma.user.findUnique({
       where: {
         email
@@ -71,13 +61,12 @@ export class AuthService {
 
     const token = await signToken(user)
 
-    user.password = undefined
     return {user,token}
 
   }
 
   
-  generateProductKet(email:string,userType:UserType){
+  generateProductKet(email:string,userType:UserTypeDto){
     const string  =`${email}-${userType}-${process.env.PRODUCT_KEY_SECRET}`
 
     return bcrypt.hash(string,10)

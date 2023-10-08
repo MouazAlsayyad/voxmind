@@ -1,6 +1,6 @@
-import { Body, Controller,Get,Param,ParseEnumPipe,Post, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller,Get,Param,Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignupDto,SigninDto, GenerateProductKeyDto } from '../dtos/auth.dto';
+import { SignupDto,SigninDto, GenerateProductKeyDto, UserTypeDto } from '../dtos/auth.dto';
 import { UserType } from '@prisma/client';
 import * as bcrypt from "bcryptjs"
 import { User,UserInfo } from '../decorators/user.decorator';
@@ -14,8 +14,9 @@ export class AuthController {
   constructor(private readonly authService:AuthService) {}
 
   @Post('/signup/:userType')
-  async signup(@Body() body:SignupDto ,@Param('userType', new ParseEnumPipe(UserType)) userType:UserType)
+  async signup(@Body() body:SignupDto ,@Param('userType') userTypeDto:UserTypeDto)
   {
+    const userType = userTypeDto.userType;
     if(userType !== UserType.BUYER){
       if(!body.productKey){
         throw new UnauthorizedException()
@@ -30,7 +31,7 @@ export class AuthController {
         throw new UnauthorizedException() 
       }
     }
-    return this.authService.signup(body,userType)
+    return this.authService.signup(body,userTypeDto)
   }
 
   @Post('/signin')

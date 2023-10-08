@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { HomeResponseDto } from './dto/home.dto';
+import { CreateHomeDto, HomeResponseDto, UpdateHomeDto } from './dto/home.dto';
 import { PropertyType } from '@prisma/client';
 import { UserInfo } from 'src/user/decorators/user.decorator';
 
@@ -13,18 +13,6 @@ interface GetHomesParam {
   }
   propertyType?:PropertyType
 }
-
-interface CreateHomeParam {
-  address:string
-  numberOfBedroom: number
-  numberOfBathrooms: number
-  city: string
-  price: number
-  landSize: number
-  propertyType: PropertyType
-  images: {url:string}[]
-}
-
 interface UpdateHomeParam {
   address?:string
   numberOfBedroom?: number
@@ -107,7 +95,7 @@ export class HomeService {
 
 
   async createHome({address, numberOfBedroom, numberOfBathrooms, city, price, 
-    landSize, propertyType, images}:CreateHomeParam, userId:number){
+    landSize, propertyType, images}:CreateHomeDto, userId:number){
     const home = await this.prisma.home.create({
       data:{
         address,
@@ -131,14 +119,38 @@ export class HomeService {
   }
 
 
-  async updateHomeById(id:number, data:UpdateHomeParam){
+  // async updateHomeById(id:number, data:UpdateHomeDto){
 
-    const updatedHome = await this.prisma.home.update({
-      where:{
-        id
-      },
-      data
-    })
+  //   const mapUpdateHomeDtoToPrismaInput = (dto: UpdateHomeDto) => {
+  //     return {
+  //       ...(dto.address && { address: dto.address }),
+  //       ...(dto.numberOfBedroom && { numberOfBedroom: dto.numberOfBedroom }),
+  //       ...(dto.numberOfBathrooms && { numberOfBathrooms: dto.numberOfBathrooms }),
+  //       ...(dto.city && { city: dto.city }),
+  //       ...(dto.price && { price: dto.price }),
+  //       ...(dto.landSize && { landSize: dto.landSize }),
+  //       ...(dto.propertyType && { propertyType: dto.propertyType }),
+  //       // Add other properties as needed
+  //     };
+  //   };
+
+  //   const updatedHome = await this.prisma.home.update({
+  //     where: {
+  //       id,
+  //     },
+  //     data: mapUpdateHomeDtoToPrismaInput(data),
+  //   });
+
+  //   return new HomeResponseDto(updatedHome)
+  // }
+
+    async updateHomeById(id:number, data:UpdateHomeParam){
+      const updatedHome = await this.prisma.home.update({
+        where:{
+          id
+        },
+        data
+      })
 
     return new HomeResponseDto(updatedHome)
   }
