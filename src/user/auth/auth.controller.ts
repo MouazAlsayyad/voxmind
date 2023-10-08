@@ -4,7 +4,10 @@ import { SignupDto,SigninDto, GenerateProductKeyDto } from '../dtos/auth.dto';
 import { UserType } from '@prisma/client';
 import * as bcrypt from "bcryptjs"
 import { User,UserInfo } from '../decorators/user.decorator';
+import { ApiForbiddenResponse, ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags('users')
 
 @Controller('auth')
 export class AuthController {
@@ -40,6 +43,7 @@ export class AuthController {
     return this.authService.generateProductKet(email,userType)
   }
 
+  @ApiForbiddenResponse({description:"Forbidden"})
   @Get("my")
   me(@User() user:UserInfo){
     return user

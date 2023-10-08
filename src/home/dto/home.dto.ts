@@ -1,14 +1,17 @@
 import { PropertyType } from "@prisma/client";
 import { Exclude,Expose, Type } from "class-transformer";
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber,  IsPositive, IsString, ValidateNested } from "class-validator";
+import { ApiProperty ,PartialType} from "@nestjs/swagger";
 
 export class HomeResponseDto {
+  @ApiProperty()
   id:number;
   address: string;
   
   @Exclude()
   number_of_bedroom: number;
 
+  @ApiProperty()
   @Expose({name:"numberOfBedroom"})
   numberOfBedroom(){
     return this.number_of_bathrooms
@@ -17,24 +20,28 @@ export class HomeResponseDto {
   @Exclude()
   number_of_bathrooms: number;
 
+  @ApiProperty()
   @Expose({name:"numberOfBathrooms"})
   numberOfBathrooms(){
     return this.number_of_bathrooms
   }
 
+  @ApiProperty()
   city: string;
 
   @Exclude()
   listed_date: Date;
 
+  @ApiProperty()
   @Expose({name:"listedDate"})
   listedDate(){
     return this.listed_date
   }
 
-  
+  @ApiProperty()
   price: number;
 
+  @ApiProperty()
   image:string
 
   @Exclude()
@@ -45,7 +52,7 @@ export class HomeResponseDto {
     return this.land_size
   }
 
-  
+  @ApiProperty()
   propertyType: PropertyType;
 
   @Exclude()
@@ -67,77 +74,51 @@ export class Image {
 }
 
 export class CreateHomeDto {
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   address:string
 
+  @ApiProperty()
   @IsNumber()
   @IsPositive()
   numberOfBedroom: number
 
+  @ApiProperty()
   @IsNumber()
   @IsPositive()
   numberOfBathrooms: number
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   city: string
 
+  @ApiProperty()
   @IsNumber()
   @IsPositive()
   price: number
 
+  @ApiProperty()
   @IsNumber()
   @IsPositive()
   landSize: number
 
+  @ApiProperty()
   @IsEnum(PropertyType)
   propertyType: PropertyType
 
+  @ApiProperty()
   @IsArray()
   @ValidateNested({each:true})
   @Type(()=>Image)
   images: Image[]
 }
 
-export class UpdateHomeDto {
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  address?: string
-
-  @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  numberOfBedroom?: number
-
-  @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  numberOfBathrooms?: number
-
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  city?: string
-
-  @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  price?: number
-
-  @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  landSize?: number
-
-  @IsOptional()
-  @IsEnum(PropertyType)
-  propertyType?: PropertyType
-
-}
+export class UpdateHomeDto extends PartialType(CreateHomeDto){}
 
 export class InquireDto {
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   message:string
