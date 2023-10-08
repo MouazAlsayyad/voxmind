@@ -29,6 +29,9 @@ export class SignupDto {
   @IsString()
   @IsNotEmpty()
   productKey?:string
+
+
+  
 }
 
 export class SigninDto {
@@ -36,7 +39,6 @@ export class SigninDto {
   @IsEmail()
   email: string;
 
-  @Exclude()
   @ApiProperty()
   @IsString()
   password:string;

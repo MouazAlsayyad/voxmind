@@ -7,8 +7,13 @@ import { HomeModule } from './home/home.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserInterceptor } from './user/interceptors/user.interceptor';
 
+import { JwtModule } from '@nestjs/jwt';
+
 @Module({
-  imports: [UserModule, PrismaModule, HomeModule],
+  imports: [UserModule, PrismaModule, HomeModule,JwtModule.register({
+    secret: process.env.JSON_TOKEN_KEY, // Replace with your secret key
+    signOptions: { expiresIn: process.env.JSON_TOKEN_EXPIRERS_IN }, // Optional: Set token expiration time
+  })],
   controllers: [AppController],
   providers: [AppService,{
     provide:APP_INTERCEPTOR,

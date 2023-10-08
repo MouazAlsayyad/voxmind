@@ -1,11 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UnauthorizedException } from '@nestjs/common';
 import { HomeService } from './home.service';
-import { CreateHomeDto, HomeResponseDto, IdParamDto, InquireDto, UpdateHomeDto } from './dto/home.dto';
-import { PropertyType, UserType } from '@prisma/client';
+import { CreateHomeDto, HomeFilterDto, HomeResponseDto, IdParamDto, InquireDto, UpdateHomeDto } from './dto/home.dto';
+import {  UserType } from '@prisma/client';
 import { User, UserInfo } from 'src/user/decorators/user.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
 
-import { ApiForbiddenResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiForbiddenResponse,  ApiTags } from '@nestjs/swagger';
 
 
 @ApiTags('homes')
@@ -16,28 +16,9 @@ export class HomeController {
 
   
   @Get()
-  @ApiQuery({ name: 'city', required: false, type: String }) 
-  @ApiQuery({ name: 'minPrice', required: false, type: String }) 
-  @ApiQuery({ name: 'maxPrice', required: false, type: String })
-  @ApiQuery({ name: 'propertyType', required: false, enum: PropertyType })
   getHomes(
-    @Query('city') city?: string,
-    @Query('minPrice') minPrice?: string,
-    @Query('maxPrice') maxPrice?: string,
-    @Query('propertyType') propertyType?: PropertyType,
+    @Query() filters: HomeFilterDto
   ): Promise<HomeResponseDto[]> {
-
-    const price = minPrice || maxPrice ? {
-      ...(minPrice && {gte: parseFloat(minPrice)}),
-      ...(maxPrice && {lte: parseFloat(maxPrice)}),
-    } : undefined
-
-
-    const filters = {
-      ...(city &&{city}),
-      ...(price &&{price}),
-      ...(propertyType &&{propertyType}),
-    }
 
     return this.homeService.getHomes(filters)
   }

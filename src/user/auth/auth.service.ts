@@ -1,8 +1,8 @@
-import { ConflictException, HttpException, Injectable } from '@nestjs/common';
+import { ConflictException, HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from "bcryptjs"
 import * as jwt from "jsonwebtoken"
-import { User } from '@prisma/client';
+import { User, UserType } from '@prisma/client';
 import { SigninDto, SignupDto, UserTypeDto } from '../dtos/auth.dto';
 
 
@@ -20,7 +20,20 @@ const signToken = async (user:User)=>{
 export class AuthService {
   constructor(private readonly prisma:PrismaService){}
   
-  async signup({email,password,name,phone}:SignupDto,userType:UserTypeDto){
+  async signup({email,password,name,phone,productKey}:SignupDto,userType:UserTypeDto){
+    if(userType.userType !== UserType.BUYER){
+      if(!productKey){
+        throw new UnauthorizedException()
+      }
+      const validProductKey = `${email}-${userType}-${process.env.PRODUCT_KEY_SECRET}`
+      const isValidProductKey = await bcrypt.compare(validProductKey,productKey)
+      if(!isValidProductKey)
+      {
+        throw new UnauthorizedException() 
+      }
+
+  }
+
     const userExists = await this.prisma.user.findUnique({
       where: {
         email

@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass123
+    ports:
+      - "5432:5432"
+  prisma:
+    image: prismagraphql/prisma:latest
+    command: ["generate"]
+    volumes:
+      - ./prisma:/prisma
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgres:pass123@postgres:5432/postgres

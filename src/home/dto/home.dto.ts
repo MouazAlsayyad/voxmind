@@ -1,6 +1,6 @@
 import { PropertyType } from "@prisma/client";
 import { Exclude,Expose, Type } from "class-transformer";
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber,  IsPositive, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber,  IsOptional,  IsPositive, IsString, ValidateNested } from "class-validator";
 import { ApiProperty ,PartialType} from "@nestjs/swagger";
 
 export class HomeResponseDto {
@@ -65,6 +65,28 @@ export class HomeResponseDto {
   constructor(partial:Partial<HomeResponseDto>){
     Object.assign(this,partial)
   }
+}
+
+export class HomeFilterDto {
+  @ApiProperty({ required: false }) // Make it optional
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @ApiProperty({ required: false }) // Make it optional
+  @IsOptional()
+  @IsNumber()
+  minPrice?: number;
+
+  @ApiProperty({ required: false }) // Make it optional
+  @IsOptional()
+  @IsNumber()
+  maxPrice?: number;
+
+  @ApiProperty({ required: false }) // Make it optional
+  @IsOptional()
+  @IsEnum(PropertyType)
+  propertyType?: PropertyType;
 }
 
 export class Image {

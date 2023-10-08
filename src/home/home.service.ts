@@ -1,27 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateHomeDto, HomeResponseDto, UpdateHomeDto } from './dto/home.dto';
-import { PropertyType } from '@prisma/client';
+import { CreateHomeDto, HomeFilterDto, HomeResponseDto, UpdateHomeDto } from './dto/home.dto';
+
 import { UserInfo } from 'src/user/decorators/user.decorator';
 
-
-interface GetHomesParam {
-  city?:string;
-  price?:{
-    gte?:number;
-    lte?:number;
-  }
-  propertyType?:PropertyType
-}
-interface UpdateHomeParam {
-  address?:string
-  numberOfBedroom?: number
-  numberOfBathrooms?: number
-  city?: string
-  price?: number
-  landSize?: number
-  propertyType?: PropertyType
-}
 
 export const homeSelect = {
   id :true,
@@ -36,8 +18,19 @@ export const homeSelect = {
 @Injectable()
 export class HomeService {
   constructor(private readonly prisma:PrismaService){}
+  async getHomes(filter: HomeFilterDto): Promise<HomeResponseDto[]> {
+    const price = filter.minPrice || filter.maxPrice ? {
+      ...(filter.minPrice && {gte: parseFloat(filter.minPrice.toString())}),
+      ...(filter.maxPrice && {lte: parseFloat(filter.maxPrice.toString())}),
+    } : undefined
+    delete filter?.minPrice;
+    delete filter?.maxPrice;
 
-  async getHomes(filter: GetHomesParam): Promise<HomeResponseDto[]> {
+      filter = {
+      ...filter,
+      ...(price &&{price}),
+      }
+
     const homes = await this.prisma.home.findMany({
       select:{
         ...homeSelect,
@@ -118,42 +111,22 @@ export class HomeService {
     return new HomeResponseDto(home)
   }
 
-
-  // async updateHomeById(id:number, data:UpdateHomeDto){
-
-  //   const mapUpdateHomeDtoToPrismaInput = (dto: UpdateHomeDto) => {
-  //     return {
-  //       ...(dto.address && { address: dto.address }),
-  //       ...(dto.numberOfBedroom && { numberOfBedroom: dto.numberOfBedroom }),
-  //       ...(dto.numberOfBathrooms && { numberOfBathrooms: dto.numberOfBathrooms }),
-  //       ...(dto.city && { city: dto.city }),
-  //       ...(dto.price && { price: dto.price }),
-  //       ...(dto.landSize && { landSize: dto.landSize }),
-  //       ...(dto.propertyType && { propertyType: dto.propertyType }),
-  //       // Add other properties as needed
-  //     };
-  //   };
-
-  //   const updatedHome = await this.prisma.home.update({
-  //     where: {
-  //       id,
-  //     },
-  //     data: mapUpdateHomeDtoToPrismaInput(data),
-  //   });
-
-  //   return new HomeResponseDto(updatedHome)
-  // }
-
-    async updateHomeById(id:number, data:UpdateHomeParam){
-      const updatedHome = await this.prisma.home.update({
-        where:{
-          id
-        },
-        data
-      })
-
+    async updateHomeById(id:number, data:UpdateHomeDto){
+    const updatedHome = await this.prisma.home.update({
+      where: {
+        id,
+      },
+      data: {
+        ...data,
+        images: {
+          createMany: { data: data.images }
+        }
+      },
+    });
     return new HomeResponseDto(updatedHome)
-  }
+    }
+    
+
 
 
   async deleteHomeById(id:number){
