@@ -14,7 +14,7 @@ export class AuthController {
 
   @Post('/signup/:userType')
   @SerializeOptions({ type: UserResponseDto })
-  async signup(@Body() body:SignupDto ,@Param('userType') userTypeDto:UserTypeDto):Promise<UserResponseDto>
+  async signup(@Body() body:SignupDto ,@Param() userTypeDto:UserTypeDto):Promise<UserResponseDto>
   {
     console.log({body,userTypeDto})
     return this.authService.signup(body,userTypeDto)
