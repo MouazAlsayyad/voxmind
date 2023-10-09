@@ -1,9 +1,19 @@
-import { User, UserType } from "@prisma/client";
+import { UserType } from "@prisma/client";
 import { IsString,IsNotEmpty, IsEmail, MinLength, Matches, IsEnum, IsOptional } from "class-validator";
 import { ApiProperty} from "@nestjs/swagger";
-import { Exclude, Type } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
 
+// enum UserType {
+//   BUYER,
+//   REALTOR,
+//   ADMIN
+// }
 
+// enum UserType {
+//   "BUYER",
+//   "REALTOR",
+//   "ADMIN"
+// }
 export class SignupDto {
   @ApiProperty()
   @IsString()
@@ -60,32 +70,29 @@ export class GenerateProductKeyDto {
   userType: UserTypeDto; 
 }
 
+@Exclude()
 export class UserResponseDto {
+  @Expose()
   @ApiProperty()
   id: number;
 
+  @Expose()
   @ApiProperty()
   name: string;
 
+  @Expose()
   @ApiProperty()
   phone: string;
 
+  @Expose()
   @ApiProperty()
   email: string;
 
+  @Expose()
   @ApiProperty()
   user_type: string;
 
+  @Expose()
   @ApiProperty()
   token:string
-
-  constructor(user: User,token:string) {
-    this.id = user.id;
-    this.name = user.name;
-    this.phone = user.phone;
-    this.email = user.email;
-    this.user_type = user.user_type;
-    this.token = token
-  }
-
 }

@@ -3,7 +3,7 @@ import { Prisma } from 'src/prisma/prisma.service';
 import * as bcrypt from "bcryptjs"
 import * as jwt from "jsonwebtoken"
 import { User, UserType } from '@prisma/client';
-import { SigninDto, SignupDto, UserResponseDto, UserTypeDto } from '../dtos/auth.dto';
+import { SigninDto, SignupDto,  UserTypeDto } from '../dtos/auth.dto';
 
 
 const signToken = async (user:User)=>{
@@ -20,7 +20,7 @@ const signToken = async (user:User)=>{
 export class AuthService {
   constructor(private readonly prisma:Prisma){}
   
-  async signup({email,password,name,phone,productKey}:SignupDto,userType:UserTypeDto){
+  async signup({email,password,name,phone,productKey}:SignupDto,userType:any){
     if(userType.userType !== UserType.BUYER){
       if(!productKey){
         throw new UnauthorizedException()
@@ -57,10 +57,11 @@ export class AuthService {
 
     const token = await signToken(user)
 
-    const userResponse = new UserResponseDto(user as User, token);
 
-
-    return userResponse
+    return {
+      ...user,
+      token
+    }
   }
 
   async signin({email,password}: SigninDto){
@@ -76,7 +77,11 @@ export class AuthService {
 
     const token = await signToken(user)
 
-    return {user,token}
+
+    return {
+      ...user,
+      token
+    }
 
   }
 

@@ -1,4 +1,4 @@
-import { Body, Controller,Get,Param,Post } from '@nestjs/common';
+import { Body, Controller,Get,Param,Post, SerializeOptions } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto,SigninDto, GenerateProductKeyDto, UserTypeDto, UserResponseDto } from '../dtos/auth.dto';
 
@@ -13,13 +13,18 @@ export class AuthController {
   constructor(private readonly authService:AuthService) {}
 
   @Post('/signup/:userType')
+  @SerializeOptions({ type: UserResponseDto })
   async signup(@Body() body:SignupDto ,@Param('userType') userTypeDto:UserTypeDto):Promise<UserResponseDto>
   {
+    console.log({body,userTypeDto})
     return this.authService.signup(body,userTypeDto)
   }
 
+
+
   @Post('/signin')
-  signin(@Body() body:SigninDto ){
+  @SerializeOptions({ type: UserResponseDto })
+  signin(@Body() body:SigninDto ):Promise<UserResponseDto>{
     return this.authService.signin(body)
   }
 
