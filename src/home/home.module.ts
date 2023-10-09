@@ -4,11 +4,12 @@ import { HomeService } from './home.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { Prisma } from 'src/prisma/prisma.service';
 
 @Module({
   imports:[PrismaModule],
   controllers: [HomeController],
-  providers: [HomeService,{
+  providers: [HomeService,Prisma,{
     provide:APP_INTERCEPTOR,
     useClass:ClassSerializerInterceptor
   },{

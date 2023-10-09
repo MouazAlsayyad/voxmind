@@ -3,7 +3,7 @@ import { Reflector } from "@nestjs/core"
 import { Request } from "express";
 
 import * as jwt from "jsonwebtoken"
-import { PrismaService } from "src/prisma/prisma.service";
+import { Prisma } from "src/prisma/prisma.service";
 
 interface JWTPayload {
   name:string;
@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate{
 
   constructor(
     private readonly reflector:Reflector,
-    private readonly prisma:PrismaService
+    private readonly prisma:Prisma
     ){}
 
   async canActivate(context:ExecutionContext){

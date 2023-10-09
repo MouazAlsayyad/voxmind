@@ -1,6 +1,6 @@
 import { Body, Controller,Get,Param,Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignupDto,SigninDto, GenerateProductKeyDto, UserTypeDto } from '../dtos/auth.dto';
+import { SignupDto,SigninDto, GenerateProductKeyDto, UserTypeDto, UserResponseDto } from '../dtos/auth.dto';
 
 import { User,UserInfo } from '../decorators/user.decorator';
 import { ApiForbiddenResponse, ApiTags } from '@nestjs/swagger';
@@ -13,7 +13,7 @@ export class AuthController {
   constructor(private readonly authService:AuthService) {}
 
   @Post('/signup/:userType')
-  async signup(@Body() body:SignupDto ,@Param('userType') userTypeDto:UserTypeDto)
+  async signup(@Body() body:SignupDto ,@Param('userType') userTypeDto:UserTypeDto):Promise<UserResponseDto>
   {
     return this.authService.signup(body,userTypeDto)
   }

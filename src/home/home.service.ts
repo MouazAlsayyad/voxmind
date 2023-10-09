@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+
 import { CreateHomeDto, HomeFilterDto, HomeResponseDto, UpdateHomeDto } from './dto/home.dto';
 
 import { UserInfo } from 'src/user/decorators/user.decorator';
+import { Prisma } from 'src/prisma/prisma.service';
 
 
 export const homeSelect = {
   id :true,
   address:true,
-  city  :true,
+  city  :true, 
   price  :true,
   propertyType  :true,
   number_of_bedroom  :true,
@@ -17,7 +18,7 @@ export const homeSelect = {
 
 @Injectable()
 export class HomeService {
-  constructor(private readonly prisma:PrismaService){}
+  constructor(private readonly prisma:Prisma){}
   async getHomes(filter: HomeFilterDto): Promise<HomeResponseDto[]> {
     const price = filter.minPrice || filter.maxPrice ? {
       ...(filter.minPrice && {gte: parseFloat(filter.minPrice.toString())}),
@@ -146,6 +147,7 @@ export class HomeService {
   }
 
   async getRealtorByHomeId(id:number){
+    
     const home = await this.prisma.home.findUnique({
       where:{
         id

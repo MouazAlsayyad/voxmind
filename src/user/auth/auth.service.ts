@@ -1,9 +1,9 @@
 import { ConflictException, HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from 'src/prisma/prisma.service';
 import * as bcrypt from "bcryptjs"
 import * as jwt from "jsonwebtoken"
 import { User, UserType } from '@prisma/client';
-import { SigninDto, SignupDto, UserTypeDto } from '../dtos/auth.dto';
+import { SigninDto, SignupDto, UserResponseDto, UserTypeDto } from '../dtos/auth.dto';
 
 
 const signToken = async (user:User)=>{
@@ -18,7 +18,7 @@ const signToken = async (user:User)=>{
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma:PrismaService){}
+  constructor(private readonly prisma:Prisma){}
   
   async signup({email,password,name,phone,productKey}:SignupDto,userType:UserTypeDto){
     if(userType.userType !== UserType.BUYER){
@@ -31,7 +31,6 @@ export class AuthService {
       {
         throw new UnauthorizedException() 
       }
-
   }
 
     const userExists = await this.prisma.user.findUnique({
@@ -58,7 +57,10 @@ export class AuthService {
 
     const token = await signToken(user)
 
-    return {user,token}
+    const userResponse = new UserResponseDto(user as User, token);
+
+
+    return userResponse
   }
 
   async signin({email,password}: SigninDto){
